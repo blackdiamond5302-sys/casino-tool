@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#142338"><title>BSM Baccarat</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101a29;color:#f2f5f8;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}.wrap{max-width:760px;margin:auto;padding:16px}.card{background:#1a2a3d;border:1px solid #34485f;border-radius:16px;padding:14px;margin:12px 0}h1{font-size:21px;margin:0}h2{font-size:14px;color:#d8e2ec;margin:0 0 12px}.muted,.k,.small{color:#a9b8c9;font-size:11px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.tile{background:#122033;border-radius:12px;padding:11px}.state{font-size:28px;font-weight:900;margin:5px 0}.B{color:#55d69a}.P{color:#ffc66e}.N{color:#aab7c5}.v{font-weight:800;font-size:15px;margin-top:5px}.recommend{display:flex;justify-content:space-between;background:#122033;padding:12px;border-radius:12px;margin-top:10px}.side,.stake{font-size:22px;font-weight:900}.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{font:inherit;cursor:pointer}.entry{border:0;border-radius:12px;padding:16px 5px;color:white;font-weight:900;font-size:17px}.entry:disabled{opacity:.35}.eb{background:#197650}.ep{background:#a56a17}.et{background:#52647a}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.action{background:#2b4057;color:#fff;border:1px solid #496079;border-radius:9px;padding:9px 12px;font-size:12px}.action:disabled{opacity:.4}.warn{background:#382d1b;border:1px solid #7b6030;color:#f5dba8;border-radius:10px;padding:10px;font-size:11px;line-height:1.6;margin-top:10px}.road{display:flex;gap:5px;overflow:auto}.dot{flex:0 0 25px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:bold;border:2px solid}.dot.B{border-color:#55d69a}.dot.P{border-color:#ffc66e}.dot.T{border-color:#aab7c5}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap}td,th{padding:8px 5px;border-bottom:1px solid #34485f;text-align:center}th{color:#a9b8c9}footer{font-size:10px;color:#93a4b7;line-height:1.6}@media(min-width:650px){.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+</style></head><body><div class="wrap">
+<header style="display:flex;justify-content:space-between;align-items:center"><div><h1>BSM Baccarat</h1><div class="muted">Pattern A · 記録・検証ツール</div></div><div id="count" class="muted">0ゲーム</div></header>
+<section class="card"><h2>センサー・次ゲーム判定</h2><div class="grid"><div class="tile"><div class="k">3枠・早期センサー</div><div id="s3" class="state N">－</div><div id="d3" class="small">判定待ち</div></div><div class="tile"><div class="k">5枠・確認センサー</div><div id="s5" class="state N">－</div><div id="d5" class="small">判定待ち</div></div></div>
+<div class="metrics"><div class="tile"><div class="k">累積スコア</div><div id="score" class="v">0</div></div><div class="tile"><div class="k">P連勝</div><div id="streak" class="v">0</div></div><div class="tile"><div class="k">ゲーム数</div><div id="games" class="v">0</div></div></div>
+<div class="recommend"><div><div class="k">次のゲームの判定側</div><div id="side" class="side B">BANKER</div><div id="reason" class="small">初期設定：B</div></div><div style="text-align:right"><div class="k">次の賭け金</div><div id="stake" class="stake">₩50,000</div></div></div></section>
+<div class="cols"><section class="card"><h2>出目を入力</h2><div class="controls"><button id="btnB" class="entry eb">BANKER</button><button id="btnP" class="entry ep">PLAYER</button><button id="btnT" class="entry et">TIE</button></div><p class="small">入力時点で表示されていた判定側・賭け金を使って損益を記録。Tは連勝と賭け金段階を維持します。</p><label class="small"><input type="checkbox" id="b6"> バンカー6勝利（利益0.5倍として仮計算）</label><div class="actions"><button class="action" id="undo">1ゲーム戻す</button><button class="action" id="csv">CSV出力</button><button class="action" id="reset">リセット</button></div></section>
+<section class="card"><h2>資金管理</h2><div class="metrics" style="margin:0"><div class="tile"><div class="k">残高</div><div id="balance" class="v">₩500,000</div></div><div class="tile"><div class="k">累計損益</div><div id="profit" class="v">+₩0</div></div><div class="tile"><div class="k">投入累計</div><div id="deposits" class="v">₩500,000</div></div></div><div id="fundmsg" class="warn">残高が₩100,000程度になったら中断して追加投入を判断してください。</div><button id="topup" class="action">追加資金 ₩500,000（1回のみ）</button></section></div>
+<section class="card"><h2>Big Road（簡易履歴）</h2><div id="road" class="road"></div></section>
+<section class="card"><h2>ゲーム履歴（直近20件）</h2><div class="tablewrap"><table><thead><tr><th>#</th><th>出目</th><th>Score</th><th>3枠</th><th>5枠</th><th>賭け側</th><th>賭け金</th><th>損益</th></tr></thead><tbody id="history"></tbody></table></div></section>
+<footer>ユーザー定義ルールの記録・検証用です。勝率・利益を保証せず、賭けを推奨するものではありません。通常B勝利は利益×0.95、B6勝利は×0.5、P勝利は×1として仮計算。実際のテーブル規則を確認してください。記録はこのブラウザ内に保存されます。</footer>
+</div>
+<script>
+const KEY='bsm-baccarat-v1',START=500000,ADD=500000,LIMIT=1000000;
+const fresh=()=>({events:[],added:false});
+let st;try{st=JSON.parse(localStorage.getItem(KEY))||fresh();if(!Array.isArray(st.events))st=fresh()}catch(e){st=fresh()}
+function money(n){return '₩'+Math.round(n).toLocaleString('en-US')}
+function calc(){
+ let score=0,run=0,last=null,side='B',stake=50000;
+ // 両センサーともB方向・基準score=0から開始する。
+ // sensor3: B→Pは最高値から3低下、P→Bは最低値から2上昇。
+ // sensor5: B→Pは最高値から5低下、P→Bは最低値から4上昇。
+ let ss=[
+  {dir:'B',ext:0,status:'－'},
+  {dir:'B',ext:0,status:'－'}
+ ],rows=[];
+ st.events.forEach((ev,i)=>{
+  if(ev.type==='TOPUP')return;
+  // 保存済みゲームは当時の実際の賭け側・賭け金・損益を保持する。
+  // 新しいセンサー判定は、次ゲーム以降の推奨側に反映する。
+  const bet=ev.bet||side,amount=Number.isFinite(ev.amount)?ev.amount:stake;
+  if(ev.r==='B')score++;if(ev.r==='P')score--;
+  if(ev.r!=='T'){run=ev.r==='P'?(last==='P'?run+1:1):0;last=ev.r}
+  [[2,3],[4,5]].forEach(([up,down],j)=>{
+   let s=ss[j];
+   // CSVには反転したゲームだけB/Pを記録し、それ以外は「－」。
+   // dirは反転後も保持する現在方向、extはその方向の極値。
+   s.status='－';
+   if(s.dir==='B'){
+    if(score>s.ext){s.ext=score}
+    else if(s.ext-score>=down){s.dir='P';s.ext=score;s.status='P'}
+   }else{
+    if(score<s.ext){s.ext=score}
+    else if(score-s.ext>=up){s.dir='B';s.ext=score;s.status='B'}
+   }
+  });
+  // BSMはセンサーの一時表示(status)ではなく、保持している方向(dir)で判定する。
+  const bothP=ss[0].dir==='P'&&ss[1].dir==='P';
+  if(side==='B'&&bothP&&run>=3)side='P';
+  else if(side==='P'&&!bothP)side='B';
+  let delta=Number.isFinite(ev.delta)?ev.delta:0;
+  if(!Number.isFinite(ev.delta)){
+   if(ev.r==='B'&&bet==='B')delta=amount*(ev.b6?.5:.95);
+   else if(ev.r==='P'&&bet==='P')delta=amount;
+   else if(ev.r!=='T')delta=-amount;
+  }
+  const win=delta>0;
+  if(ev.r!=='T')stake=win?(amount===50000?100000:50000):50000;
+  rows.push({i:i+1,r:ev.r,b6:ev.b6,score,s3:ss[0].status,s5:ss[1].status,bet,amount,delta});
+ });
+ return {score,run,side,stake,s3:ss[0].status,s5:ss[1].status,s3dir:ss[0].dir,s5dir:ss[1].dir,rows};
+}
+function finances(){let balance=START,profit=0,added=false;st.events.forEach(e=>{if(e.type==='TOPUP'){if(!added){balance+=ADD;added=true}}else{let d=e.delta||0;balance+=d;profit+=d}});return{balance,profit,added,deposits:START+(added?ADD:0),stopped:profit<=-LIMIT||balance<=0}}
+function save(){localStorage.setItem(KEY,JSON.stringify(st))}
+function render(){
+ let c=calc(),f=finances();
+ [['s3',c.s3],['s5',c.s5]].forEach(([id,v])=>{
+  let e=document.getElementById(id);e.textContent=v;e.className='state '+(v==='B'?'B':v==='P'?'P':'N');
+  let dir=id==='s3'?c.s3dir:c.s5dir;
+  document.getElementById(id==='s3'?'d3':'d5').textContent='現在方向：'+dir+' ／ '+(v==='－'?'今回反転なし':'今回'+v+'方向の更新・反転');
+ });
+ document.getElementById('score').textContent=c.score>0?'+'+c.score:c.score;
+ document.getElementById('streak').textContent=c.run+'連勝';
+ document.getElementById('games').textContent=c.rows.length;
+ document.getElementById('count').textContent=c.rows.length+'ゲーム';
+ let s=document.getElementById('side');s.textContent=c.side==='B'?'BANKER':'PLAYER';s.className='side '+c.side;
+ document.getElementById('reason').textContent=c.side==='P'?'両センサーP方向＋P3連勝':'B継続／P切替条件未成立';
+ document.getElementById('stake').textContent=money(c.stake);
+ document.getElementById('balance').textContent=money(f.balance);
+ document.getElementById('profit').textContent=(f.profit>=0?'+':'−')+money(Math.abs(f.profit));
+ document.getElementById('deposits').textContent=money(f.deposits);
+ document.getElementById('fundmsg').textContent=f.stopped?'損失上限に到達。セッションを終了してください。':f.balance<=100000&&!f.added?'残高₩100,000以下。一度中断して追加投入を判断してください。':f.added?'追加資金投入済み。追加はできません。':'残高が₩100,000程度になったら中断して追加投入を判断してください。';
+ document.getElementById('topup').disabled=f.added||f.stopped;
+ ['btnB','btnP','btnT'].forEach(id=>document.getElementById(id).disabled=f.stopped);
+ document.getElementById('road').innerHTML=c.rows.map(x=>'<span class="dot '+x.r+'">'+x.r+'</span>').join('');
+ document.getElementById('history').innerHTML=c.rows.slice(-20).reverse().map(x=>'<tr><td>'+x.i+'</td><td>'+x.r+(x.b6?'6':'')+'</td><td>'+x.score+'</td><td>'+x.s3+'</td><td>'+x.s5+'</td><td>'+x.bet+'</td><td>'+money(x.amount)+'</td><td>'+(x.delta>=0?'+':'−')+money(Math.abs(x.delta))+'</td></tr>').join('');
+}
+function add(r,b6=false){let f=finances();if(f.stopped)return;let c=calc(),bet=c.side,amount=c.stake,delta=0;if(r==='B'&&bet==='B')delta=amount*(b6?.5:.95);else if(r==='P'&&bet==='P')delta=amount;else if(r!=='T')delta=-amount;st.events.push({type:'GAME',r,b6,bet,amount,delta});save();render()}
+document.getElementById('btnB').onclick=()=>{add('B',document.getElementById('b6').checked);document.getElementById('b6').checked=false};
+document.getElementById('btnP').onclick=()=>add('P');
+document.getElementById('btnT').onclick=()=>add('T');
+document.getElementById('undo').onclick=()=>{let i=st.events.map(e=>e.type).lastIndexOf('GAME');if(i>=0)st.events.splice(i,1);save();render()};
+document.getElementById('topup').onclick=()=>{if(finances().added||finances().stopped)return;if(confirm('追加資金₩500,000を投入しますか？')){st.events.push({type:'TOPUP'});save();render()}};
+document.getElementById('reset').onclick=()=>{if(confirm('全記録を消去しますか？')){st=fresh();save();render()}};
+document.getElementById('csv').onclick=()=>{
+ let rows=calc().rows,lines=['game,result,score,sensor3,sensor5,bet_side,stake,profit,banker6'];
+ rows.forEach(x=>lines.push([x.i,x.r,x.score,x.s3,x.s5,x.bet,x.amount,x.delta,x.b6?1:0].join(',')));
+ let blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='bsm-baccarat.csv';a.click();URL.revokeObjectURL(url)
+};
+render();
+</script></body></html>
